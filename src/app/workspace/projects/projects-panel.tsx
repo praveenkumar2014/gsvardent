@@ -14,10 +14,17 @@ export function ProjectsPanel({ workspaceId, initialProjects }: { workspaceId: s
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
+  const [editName, setEditName] = useState(initialProjects[0]?.name ?? "");
+  const [editDescription, setEditDescription] = useState(initialProjects[0]?.description ?? "");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
 
   const selected = projects.find((project) => project.id === selectedId);
+
+  useEffect(() => {
+    setEditName(selected?.name ?? "");
+    setEditDescription(selected?.description ?? "");
+  }, [selectedId]);
 
   async function loadTasks(projectId: string) {
     if (!projectId) { setTasks([]); return; }
@@ -46,6 +53,24 @@ export function ProjectsPanel({ workspaceId, initialProjects }: { workspaceId: s
       setNotice("Project created and saved to Supabase.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Project creation failed.");
+    } finally { setBusy(false); }
+  }
+
+  async function updateProject(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedId) return;
+    setBusy(true); setNotice("");
+    try {
+      const response = await fetch(`/api/projects/${selectedId}`, {
+        method: "PATCH", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ workspaceId, name: editName, description: editDescription })
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? "Project update failed.");
+      setProjects((current) => current.map((item) => item.id === selectedId ? { ...item, ...payload.project } : item));
+      setNotice("Project details updated.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Project update failed.");
     } finally { setBusy(false); }
   }
 
@@ -111,6 +136,11 @@ export function ProjectsPanel({ workspaceId, initialProjects }: { workspaceId: s
 
         <section className="module-card task-card">
           <div className="card-heading"><div><span className="card-kicker">DELIVERY BACKLOG</span><h2>{selected?.name ?? "Select a project"}</h2><p>{selected?.description || "Tasks are stored in Supabase and scoped to this project."}</p></div><span className="card-icon">☷</span></div>
+          {selected && <form className="project-edit-form" onSubmit={updateProject}>
+            <input aria-label="Project name" value={editName} onChange={(event) => setEditName(event.target.value)} minLength={2} maxLength={120} required />
+            <input aria-label="Project description" value={editDescription} onChange={(event) => setEditDescription(event.target.value)} maxLength={4000} placeholder="Project description" />
+            <button className="module-secondary" disabled={busy || editName.trim().length < 2}>Save details</button>
+          </form>}
           {selected && <form className="inline-create" onSubmit={createTask}>
             <input aria-label="New task title" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Add a task to this project…" minLength={2} required />
             <button className="module-primary" type="submit" disabled={busy || taskTitle.trim().length < 2}>Add task</button>
