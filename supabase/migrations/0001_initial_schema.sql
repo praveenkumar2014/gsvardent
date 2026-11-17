@@ -225,6 +225,40 @@ create trigger projects_audit
   after insert or update or delete on public.projects
   for each row execute procedure public.audit_workspace_change();
 
+create or replace function public.audit_workspace_update()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  insert into public.audit_logs (workspace_id, actor_id, action, entity_type, entity_id, metadata)
+  values (
+    new.id, (select auth.uid()), 'workspace.updated', 'workspace', new.id::text,
+    jsonb_build_object('operation', tg_op)
+  );
+  return new;
+end;
+$;
+
+create trigger workspaces_audit
+  after update on public.workspaces
+  for each row execute procedure public.audit_workspace_update();
+
+create or replace function public.prevent_audit_log_mutation()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  raise exception 'audit_logs is append-only';
+end;
+$;
+
+create trigger audit_logs_immutable
+  before update or delete on public.audit_logs
+  for each row execute procedure public.prevent_audit_log_mutation();
+
 alter table public.profiles enable row level security;
 alter table public.workspaces enable row level security;
 alter table public.workspace_memberships enable row level security;
@@ -261,7 +295,13 @@ create policy "memberships_insert_admin"
   );
 create policy "memberships_update_admin"
   on public.workspace_memberships for update to authenticated
-  using (public.has_workspace_role(workspace_id, array['superuser','admin']::public.workspace_role[]))
+  using (
+    public.has_workspace_role(workspace_id, array['superuser']::public.workspace_role[])
+    or (
+      role <> 'superuser'
+      and public.has_workspace_role(workspace_id, array['admin']::public.workspace_role[])
+    )
+  )
   with check (
     (
       role <> 'superuser'
@@ -272,7 +312,13 @@ create policy "memberships_update_admin"
 create policy "memberships_delete_admin"
   on public.workspace_memberships for delete to authenticated
   using (
-    public.has_workspace_role(workspace_id, array['superuser','admin']::public.workspace_role[])
+    (
+      public.has_workspace_role(workspace_id, array['superuser']::public.workspace_role[])
+      or (
+        role <> 'superuser'
+        and public.has_workspace_role(workspace_id, array['admin']::public.workspace_role[])
+      )
+    )
     and user_id <> (select auth.uid())
   );
 
