@@ -6,7 +6,7 @@ export default async function HomePage() {
   if (!isSupabaseConfigured()) redirect("/login?setup=required");
 
   const supabase = await createClient();
-  const { data: { claims } } = await supabase.auth.getClaims();
+  const { data: verified } = await supabase.auth.getClaims();
 
-  redirect(claims ? "/workspace" : "/login");
+  redirect(verified?.claims ? "/workspace" : "/login");
 }
