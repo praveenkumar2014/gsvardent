@@ -232,7 +232,8 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $fn$
+
 begin
   insert into public.audit_logs (workspace_id, actor_id, action, entity_type, entity_id, metadata)
   values (
@@ -241,7 +242,7 @@ begin
   );
   return new;
 end;
-$;
+$fn$;
 
 create trigger workspaces_audit
   after update on public.workspaces
@@ -251,12 +252,13 @@ create or replace function public.prevent_audit_log_mutation()
 returns trigger
 language plpgsql
 set search_path = ''
-as $
+as $fn$
+
 begin
   raise exception 'audit_logs is append-only';
   return null;
 end;
-$;
+$fn$;
 
 create trigger audit_logs_immutable
   before update or delete on public.audit_logs
@@ -339,12 +341,14 @@ create policy "projects_insert_non_investor"
 create policy "projects_update_staff_admin"
   on public.projects for update to authenticated
   using (
-    public.has_workspace_role(
+    created_by = (select auth.uid())
+    or public.has_workspace_role(
       workspace_id, array['superuser','admin','staff']::public.workspace_role[]
     )
   )
   with check (
-    public.has_workspace_role(
+    created_by = (select auth.uid())
+    or public.has_workspace_role(
       workspace_id, array['superuser','admin','staff']::public.workspace_role[]
     )
   );

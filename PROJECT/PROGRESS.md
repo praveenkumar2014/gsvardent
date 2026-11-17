@@ -3,28 +3,29 @@
 **Last updated:** 2026-11-18
 
 ## Verified on main
-- Repository is private; default branch is `main`.
-- Planning/specification suite and GitHub Actions documentation validation were merged through PR #1.
-- Main branch CI run for the planning baseline completed successfully.
-- The initial main-branch baseline did not contain application source or a package manifest.
+- PR #1 merged the planning/specification suite and documentation CI.
+- PR #2 merged the Next.js 16/React 19 app foundation, Supabase SSR login flow, protected workspace shell and initial database migration.
+- The most recent recorded PR #2 GitHub Actions run passed the project validator and TypeScript/production build.
 
-## Implemented on feature branch
-- Next.js App Router scaffold using React and strict TypeScript.
-- Email magic-link sign-in UI and optional Google OAuth sign-in flow.
-- Supabase SSR browser/server clients with cookie refresh through the Next.js 16 `proxy.ts` convention.
-- Callback route exchanges the auth code for a cookie-backed session.
-- Protected workspace route validates JWT claims before rendering.
-- Initial workspace UI shell with navigation and explicit not-yet-connected module states.
-- Zod email input validation.
-- Initial Supabase migration draft for profiles, workspaces, five workspace roles, memberships, projects, RLS and trigger-maintained audit events.
-- CI updated to run application typecheck/build and validate app files.
+## Implemented on PR #3 feature branch
+- Supabase-backed project list/create/update APIs and UI.
+- Supabase-backed task list/create/status-update APIs and UI.
+- Manager plan-decomposition API with schema-validated model response support via server-only configuration and a clearly identified rules-based fallback.
+- Persisted Manager plans and generated task records.
+- Hivemind-style agent team board and event timeline backed by agent_runs/agent_events.
+- Agent assignment records remain in waiting_approval; no real execution is claimed.
+- Read-only terminal preview; arbitrary shell execution is disabled until an isolated worker is implemented.
+- Workspace Admin console for member roles and read-only audit history.
+- Role-scoped APIs and second Supabase migration with composite workspace references, RLS and restricted grants.
+- GitHub CI validator expanded to verify all core module files.
 
-## Not yet verified / not complete
-- Feature branch app CI has not yet passed.
-- No Supabase project credentials are present; live email/Google login cannot be exercised.
-- Migration has not been applied to a Supabase project and RLS policies have not been integration-tested.
-- Project/plan/task persistence, Manager decomposition, agent execution, terminal/preview, Skills/MCP registry and audit viewer UI are not implemented.
-- No deployment host, environment secrets or production URL is configured.
+## Pending external configuration / verification
+- PR #3 GitHub Actions run #44190825551 passed: project/application structure validation, TypeScript check and Next.js production build.
+- Supabase migrations have not been applied to a configured Supabase project; live RLS behavior has not been integration-tested.
+- Supabase URL and publishable key are not configured in a deployment environment.
+- Model API URL/key/model are optional and not configured; until configured, Manager uses rules-based decomposition.
+- Isolated agent worker/terminal execution, tool permissions and secure cancellation remain unimplemented.
+- Production hosting, domain, secrets, health checks and rollback target are not configured.
 
-## Evidence rules
-A source file is not proof of a deployed or fully working feature. Mark integration tasks complete only after real environment tests, positive/negative authorization tests and workflow evidence exist.
+## Evidence policy
+A UI or source file is not proof of a deployed or fully working feature. Mark integration work complete only after real environment tests, positive/negative authorization tests and passing workflow evidence exist.
