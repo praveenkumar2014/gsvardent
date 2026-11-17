@@ -294,3 +294,18 @@ a{color:inherit;text-decoration:none}
 @media(max-width:1080px){.projects-layout{grid-template-columns:1fr}.hive-board{grid-template-columns:repeat(5,minmax(170px,1fr))}.workspace-module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.module-page{padding:28px 16px}.hive-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hive-lower-grid{grid-template-columns:1fr}.module-heading{align-items:start;flex-direction:column}.module-count,.admin-actor-chip{align-self:start}}
 @media(max-width:600px){.manager-hero{padding:20px;gap:16px}.manager-orbit{width:76px;height:76px}.manager-orbit span{width:38px;height:38px}.manager-hero h2{font-size:22px}.composer-footer{align-items:stretch;flex-direction:column}.composer-footer button{width:100%}.plan-result-header{flex-direction:column}.plan-task-row{align-items:start;flex-wrap:wrap}.plan-task-row .task-status{margin-left:40px}.workspace-module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-table{min-width:550px}.audit-row{align-items:start}.inline-create{flex-direction:column}}
+
+.project-edit-form{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin:-4px 0 13px}
+.project-edit-form input{min-width:0;border:1px solid var(--line);border-radius:7px;padding:9px 10px;background:#0c1413;color:#dce9df;font-size:10px;outline:none}
+.project-edit-form input:focus{border-color:rgba(158,231,196,.65)}
+.manager-history{display:grid;gap:6px}
+.manager-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.015)}
+.manager-history-row strong{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.manager-history-row span,.manager-history-row small{font:8px var(--font-mono);color:#809087;text-transform:uppercase}
+.skills-placeholder{max-width:800px;padding:30px}
+.skills-placeholder h2{font:600 23px var(--font-display);margin:12px 0}
+.skills-placeholder>p{color:#89978f;font-size:12px;line-height:1.7;max-width:660px}
+.skills-checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0;color:#b5d9c2;font-size:11px}
+.skills-checks span{border:1px solid var(--line);border-radius:7px;padding:11px;background:rgba(255,255,255,.015)}
+.module-hint{padding-top:14px;border-top:1px solid var(--line);font-size:9px!important;color:#66766b!important}
+@media(max-width:700px){.project-edit-form{grid-template-columns:1fr}.manager-history-row{grid-template-columns:1fr 1fr}.manager-history-row strong{grid-column:1/-1}.skills-checks{grid-template-columns:1fr}}
