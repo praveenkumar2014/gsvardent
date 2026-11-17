@@ -50,8 +50,10 @@ create index projects_workspace_created_idx
 
 create table public.audit_logs (
   id bigint generated always as identity primary key,
-  workspace_id uuid references public.workspaces(id) on delete set null,
-  actor_id uuid references auth.users(id) on delete set null,
+  -- UUID snapshots are intentionally not foreign keys: audit rows must survive
+  -- workspace/user deletion without an ON DELETE update mutating history.
+  workspace_id uuid,
+  actor_id uuid,
   action text not null,
   entity_type text not null,
   entity_id text,
