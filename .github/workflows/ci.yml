@@ -27,29 +27,40 @@ jobs:
   application:
     name: Application quality gates
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('package.json') != '' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Detect application scaffold
+        id: detect
+        shell: bash
+        run: |
+          if [ -f package.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No package.json yet; application build checks are not applicable."
+          fi
       - name: Set up Node.js
+        if: steps.detect.outputs.present == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install dependencies (pnpm)
-        if: hashFiles('pnpm-lock.yaml') != ''
+        if: steps.detect.outputs.present == 'true' && hashFiles('pnpm-lock.yaml') != ''
         run: corepack enable && pnpm install --frozen-lockfile
       - name: Install dependencies (npm)
-        if: hashFiles('package-lock.json') != ''
+        if: steps.detect.outputs.present == 'true' && hashFiles('package-lock.json') != ''
         run: npm ci
       - name: Install dependencies (Yarn)
-        if: hashFiles('yarn.lock') != ''
+        if: steps.detect.outputs.present == 'true' && hashFiles('yarn.lock') != ''
         run: corepack yarn install --immutable
       - name: Require a committed lockfile
-        if: hashFiles('pnpm-lock.yaml') == '' && hashFiles('package-lock.json') == '' && hashFiles('yarn.lock') == ''
+        if: steps.detect.outputs.present == 'true' && hashFiles('pnpm-lock.yaml') == '' && hashFiles('package-lock.json') == '' && hashFiles('yarn.lock') == ''
         run: |
-          echo '::error::package.json exists but no supported lockfile was found. Commit a supported lockfile.'
+          echo "::error::package.json exists but no supported lockfile was found. Commit pnpm-lock.yaml, package-lock.json, or yarn.lock."
           exit 1
-      - name: Run lint, typecheck, tests, and build
+      - name: Run available quality checks and required build
+        if: steps.detect.outputs.present == 'true'
         shell: bash
         run: |
           set -euo pipefail
