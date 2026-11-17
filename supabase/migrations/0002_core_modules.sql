@@ -250,6 +250,9 @@ create policy "agent_runs_insert_operator"
   on public.agent_runs for insert to authenticated
   with check (
     started_by = (select auth.uid())
+    and status = 'waiting_approval'
+    and progress = 0
+    and started_at is null
     and public.has_workspace_role(
       workspace_id, array['superuser','admin','staff','user']::public.workspace_role[]
     )
@@ -264,7 +267,8 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $fn$
+
 begin
   insert into public.agent_events (workspace_id, agent_run_id, event_type, level, message)
   values (
@@ -276,7 +280,7 @@ begin
   );
   return new;
 end;
-$;
+$fn$;
 
 create trigger agent_run_assignment_event
   after insert on public.agent_runs
