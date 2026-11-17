@@ -1,0 +1,22 @@
+Verdent — System Master Architecture & Single Source of Truth (SSOT)
+1. System Identity & Mission
+Brand Name: Verdent
+Tagline: Turn ideas into real work you can build, run, and review with Verdent.
+System Classification: Multi-Agent Autonomous Software Engineering & Operations Platform.
+2. Executive Principles & Operational Constraints
+Business Impact & Scalability First: Architecture prioritizes cost predictability (edge serverless, token optimization via cached skill schemas) and high developer velocity without enterprise risk.
+Zero-Trust Security Baseline: No client-side service tokens; strict Row-Level Security on 100% of database tables; strict Content Security Policy; rate limiting on all public endpoints.
+Immutable Auditing: Every administrative change, login event, role modification, export, and autonomous agent action writes synchronously to an append-only audit_logs table.
+Strict Type Safety & Layer Decoupling: Strict TypeScript (noImplicitAny, zero any), runtime Zod schema validation at all network and IPC boundaries, and clear separation between UI, state, domain logic, and Supabase client layers.
+3. Directory Map & Structural Cross-References
+/instructions/: Core behavioral protocols for agents, rules of engagement, and decision logs.
+/product/: Product requirements, user personas, comprehensive user stories, and acceptance criteria.
+/design/: Design system tokens (Tailwind, Radix/shadcn), wireframes, sitemaps, and screen inventory.
+/architecture/: Structural blueprints, tech stack definitions, database schemas with RLS, and security policies.
+/development/: Coding standards, database guidelines, frontend/backend engineering rules.
+/agents/: Operational contracts and system prompts for specialized autonomous worker agents.
+/skills/: Capability specs for modular tools (MCP builder, database blueprints, browser automation).
+/testing/: Test plans, acceptance criteria suites, and bug-tracking triage workflows.
+/deployment/: CI/CD pipelines, Docker/Edge runtime configurations, and disaster recovery runbooks.
+/reports/: Milestones, release notes, and progress telemetry.
+4. Master Data Model Overview
