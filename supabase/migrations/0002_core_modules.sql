@@ -10,7 +10,8 @@ language sql
 stable
 security definer
 set search_path = ''
-as $
+as $fn$
+
   select exists (
     select 1
     from public.workspace_memberships actor_membership
@@ -19,7 +20,7 @@ as $
     where actor_membership.user_id = (select auth.uid())
       and target_membership.user_id = target_user
   );
-$;
+$fn$;
 
 revoke all on function public.is_profile_workspace_member(uuid) from public;
 grant execute on function public.is_profile_workspace_member(uuid) to authenticated;
