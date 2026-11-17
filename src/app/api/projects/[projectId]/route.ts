@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, route: RouteContext) {
   const parsed = updateProjectSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid project update." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff"]);
+  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { workspaceId, ...updates } = parsed.data;
