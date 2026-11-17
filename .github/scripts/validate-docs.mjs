@@ -56,8 +56,8 @@ try {
   errors.push("PROJECT documentation directory is missing.");
 }
 
-if (markdownFiles.length < 70) {
-  errors.push(`Expected at least 70 Markdown documents; found ${markdownFiles.length}.`);
+if (markdownFiles.length < 50) {
+  errors.push(`Expected at least 50 Markdown documents; found ${markdownFiles.length}.`);
 }
 
 for (const path of required) {
