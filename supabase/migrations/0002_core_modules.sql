@@ -1,10 +1,37 @@
 -- Verdent core modules: planning, tasks and multi-agent visibility.
 -- Requires 0001_initial_schema.sql.
 
+alter table public.projects
+  add constraint projects_id_workspace_unique unique (id, workspace_id);
+
+create or replace function public.is_profile_workspace_member(target_user uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $
+  select exists (
+    select 1
+    from public.workspace_memberships actor_membership
+    join public.workspace_memberships target_membership
+      on target_membership.workspace_id = actor_membership.workspace_id
+    where actor_membership.user_id = (select auth.uid())
+      and target_membership.user_id = target_user
+  );
+$;
+
+revoke all on function public.is_profile_workspace_member(uuid) from public;
+grant execute on function public.is_profile_workspace_member(uuid) to authenticated;
+
+create policy "profiles_select_workspace_peers"
+  on public.profiles for select to authenticated
+  using (public.is_profile_workspace_member(id));
+
 create table public.manager_plans (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  project_id uuid not null references public.projects(id) on delete cascade,
+  project_id uuid not null,
   title text not null check (char_length(title) between 1 and 180),
   source_prompt text not null check (char_length(source_prompt) between 1 and 12000),
   description text not null default '',
@@ -16,7 +43,10 @@ create table public.manager_plans (
   approved_by uuid references auth.users(id),
   approved_at timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (id, workspace_id),
+  foreign key (project_id, workspace_id)
+    references public.projects(id, workspace_id) on delete cascade
 );
 
 create index manager_plans_workspace_created_idx
@@ -27,8 +57,8 @@ create index manager_plans_project_created_idx
 create table public.tasks (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  project_id uuid not null references public.projects(id) on delete cascade,
-  plan_id uuid references public.manager_plans(id) on delete set null,
+  project_id uuid not null,
+  plan_id uuid,
   title text not null check (char_length(title) between 1 and 180),
   description text not null default '',
   status text not null default 'backlog'
@@ -39,7 +69,11 @@ create table public.tasks (
   position integer not null default 0,
   created_by uuid not null references auth.users(id),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  foreign key (project_id, workspace_id)
+    references public.projects(id, workspace_id) on delete cascade,
+  foreign key (plan_id, workspace_id)
+    references public.manager_plans(id, workspace_id) on delete cascade
 );
 
 create index tasks_workspace_project_idx on public.tasks (workspace_id, project_id, position, created_at);
@@ -48,9 +82,9 @@ create index tasks_plan_idx on public.tasks (plan_id);
 create table public.agent_runs (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  project_id uuid not null references public.projects(id) on delete cascade,
-  plan_id uuid references public.manager_plans(id) on delete set null,
-  task_id uuid references public.tasks(id) on delete set null,
+  project_id uuid not null,
+  plan_id uuid,
+  task_id uuid,
   agent_name text not null,
   agent_role text not null,
   status text not null default 'waiting_approval'
@@ -61,7 +95,14 @@ create table public.agent_runs (
   started_at timestamptz,
   finished_at timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  unique (id, workspace_id),
+  foreign key (project_id, workspace_id)
+    references public.projects(id, workspace_id) on delete cascade,
+  foreign key (plan_id, workspace_id)
+    references public.manager_plans(id, workspace_id) on delete set null (plan_id),
+  foreign key (task_id, workspace_id)
+    references public.tasks(id, workspace_id) on delete set null (task_id)
 );
 
 create index agent_runs_workspace_created_idx on public.agent_runs (workspace_id, created_at desc);
@@ -70,12 +111,14 @@ create index agent_runs_project_status_idx on public.agent_runs (project_id, sta
 create table public.agent_events (
   id bigint generated always as identity primary key,
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
-  agent_run_id uuid not null references public.agent_runs(id) on delete cascade,
+  agent_run_id uuid not null,
   event_type text not null,
   level text not null default 'info' check (level in ('info','success','warning','error')),
   message text not null check (char_length(message) between 1 and 4000),
   metadata jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  foreign key (agent_run_id, workspace_id)
+    references public.agent_runs(id, workspace_id) on delete cascade
 );
 
 create index agent_events_run_created_idx on public.agent_events (agent_run_id, created_at);
@@ -104,11 +147,17 @@ declare
 begin
   if tg_op = 'DELETE' then
     workspace_key := old.workspace_id;
-    actor_key := coalesce((select auth.uid()), old.created_by);
+    actor_key := case
+      when tg_table_name = 'agent_runs' then coalesce((select auth.uid()), old.started_by)
+      else coalesce((select auth.uid()), old.created_by)
+    end;
     entity_key := old.id::text;
   else
     workspace_key := new.workspace_id;
-    actor_key := coalesce((select auth.uid()), new.created_by);
+    actor_key := case
+      when tg_table_name = 'agent_runs' then coalesce((select auth.uid()), new.started_by)
+      else coalesce((select auth.uid()), new.created_by)
+    end;
     entity_key := new.id::text;
   end if;
 
