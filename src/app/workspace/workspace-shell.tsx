@@ -36,6 +36,7 @@ export function WorkspaceShell({ email }: { email: string }) {
   function submitPrompt(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!prompt.trim()) return;
+    sessionStorage.setItem("verdent.pendingManagerPrompt", prompt.trim());
     router.push("/workspace/managers");
   }
 
