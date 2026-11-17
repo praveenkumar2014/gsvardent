@@ -1,4 +1,5 @@
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const required = [
   "PROJECT/MASTER.md",
@@ -12,24 +13,81 @@ const required = [
   "PROJECT/architecture/database.md",
   "PROJECT/architecture/rbac.md",
   "PROJECT/architecture/security.md",
-  "PROJECT/design/screen-inventory.md",
+  "PROJECT/design/design-system.md",
+  "PROJECT/product/user-stories.md",
+  "PROJECT/development/coding-standards.md",
   "PROJECT/testing/testing-strategy.md",
   "PROJECT/deployment/ci-cd.md",
-  "PROJECT/reports/release-readiness.md"
+  "PROJECT/reports/release-readiness.md",
+  "package.json",
+  "tsconfig.json",
+  "src/app/layout.tsx",
+  "src/app/page.tsx",
+  "src/app/login/page.tsx",
+  "src/app/login/login-form.tsx",
+  "src/app/workspace/page.tsx",
+  "src/lib/supabase/server.ts",
+  "src/lib/supabase/proxy.ts",
+  "proxy.ts",
+  "src/app/auth/callback/route.ts",
+  ".env.example",
+  "supabase/migrations/0001_initial_schema.sql"
+];
+
+const sections = [
+  "instructions", "product", "design", "architecture", "development",
+  "agents", "skills", "testing", "deployment", "reports"
 ];
 
 const errors = [];
-for (const path of required) {
-  try {
-    if (!statSync(path).isFile() || readFileSync(path, "utf8").trim().length < 100) {
-      errors.push(`Missing or unexpectedly short required document: ${path}`);
-    }
-  } catch {
-    errors.push(`Missing required document: ${path}`);
+const markdownFiles = [];
+
+function walk(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) walk(path);
+    else if (entry.isFile() && path.endsWith(".md")) markdownFiles.push(path);
   }
 }
+
+try {
+  walk("PROJECT");
+} catch {
+  errors.push("PROJECT documentation directory is missing.");
+}
+
+if (markdownFiles.length < 50) {
+  errors.push(`Expected at least 50 Markdown documents; found ${markdownFiles.length}.`);
+}
+
+for (const path of required) {
+  try {
+    if (!statSync(path).isFile() || readFileSync(path, "utf8").trim().length < 30) {
+      errors.push(`Missing or unexpectedly short required file: ${path}`);
+    }
+  } catch {
+    errors.push(`Missing required file: ${path}`);
+  }
+}
+
+for (const section of sections) {
+  try {
+    if (!statSync(join("PROJECT", section)).isDirectory()) {
+      errors.push(`Missing required PROJECT section: ${section}`);
+    }
+  } catch {
+    errors.push(`Missing required PROJECT section: ${section}`);
+  }
+}
+
+const rbac = readFileSync("PROJECT/architecture/rbac.md", "utf8").toLowerCase();
+for (const role of ["superuser", "admin", "staff", "investor", "user"]) {
+  if (!rbac.includes(role)) errors.push(`RBAC specification is missing role: ${role}`);
+}
+
 if (errors.length) {
   for (const error of errors) console.error(`::error::${error}`);
   process.exit(1);
 }
-console.log(`Validated ${required.length} required Verdent planning documents.`);
+
+console.log(`Validated ${markdownFiles.length} planning documents and required application files.`);

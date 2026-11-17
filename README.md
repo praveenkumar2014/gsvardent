@@ -1,32 +1,35 @@
-# Verdent
+# Verdent — AI Engineering Workspace
 
-A secure, inspectable AI engineering workspace: plan work, coordinate bounded agents, review changes, and deliver with auditable controls.
+Verdent is being built as a secure workspace for turning product ideas into reviewable plans, coordinating bounded agents, and delivering work with human approval and audit history.
 
-## Project documentation
-The maintained planning and implementation source of truth is in [PROJECT/](PROJECT/MASTER.md).
-
-- [Master project plan](PROJECT/MASTER.md)
+## Project direction
+- [Master plan](PROJECT/MASTER.md)
 - [Product requirements](PROJECT/PRD.md)
-- [Requirements and acceptance catalogue](PROJECT/REQUIREMENTS.md)
-- [Roadmap](PROJECT/ROADMAP.md)
+- [Progress register](PROJECT/PROGRESS.md)
 - [Execution backlog](PROJECT/TASKS.md)
-- [Progress and verified repository status](PROJECT/PROGRESS.md)
-- [Architecture](PROJECT/architecture/architecture.md)
-- [Security baseline](PROJECT/architecture/security.md)
-- [RBAC model](PROJECT/architecture/rbac.md)
-- [Database baseline](PROJECT/architecture/database.md)
-- [Screen inventory](PROJECT/design/screen-inventory.md)
-- [Testing strategy](PROJECT/testing/testing-strategy.md)
-- [CI/CD policy](PROJECT/deployment/ci-cd.md)
-- [Release readiness](PROJECT/reports/release-readiness.md)
+- [Architecture and security](PROJECT/architecture/architecture.md)
 
-## Security principles
-Strict TypeScript and Zod validation at trust boundaries; deny-by-default Supabase Row-Level Security across exposed tables; five-tier scoped authorization; append-only audit logs; and a hard boundary between UI, orchestration, and agent execution.
+## Application foundation
+This branch introduces a Next.js App Router application with:
+- Email magic-link sign-in and optional Google OAuth via Supabase Auth.
+- Cookie-based Supabase SSR session handling and JWT claim verification.
+- A protected Verdent workspace shell and early dashboard interface.
+- Strict TypeScript and Zod email validation.
+- Initial workspace, membership, project and append-only audit schema with RLS policies.
 
-## Current implementation status
-This repository currently contains the planning baseline and GitHub Actions validation. It does **not** yet contain a web application, package manifest, Supabase migrations, tests, or a configured deployment target. See [progress](PROJECT/PROGRESS.md). CI runs documentation validation now and activates application install, quality and build checks once a package manifest and supported lockfile are added.
+## Authentication setup
+1. Create or select the Supabase project for Verdent.
+2. Apply `supabase/migrations/0001_initial_schema.sql` in the Supabase SQL editor or through the migration workflow you use.
+3. Enable Email authentication. Enable Google OAuth only if you have configured its OAuth credentials in Supabase.
+4. Add these environment variables to the deployment:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+5. Add the deployed origin and `/auth/callback` to the Supabase Auth redirect allowlist.
 
-## Development
-When the application scaffold is introduced, commit its lockfile and define at least a `build` script in `package.json`. Optional scripts recognized by CI are `lint`, `typecheck`, and `test`.
+Copy `.env.example` as the environment variable reference. Never add a service-role key to a `NEXT_PUBLIC_*` variable or commit secrets.
 
-Production deployment remains intentionally unconfigured until a hosting provider, protected environment, secrets, health check and rollback plan are documented.
+## Build
+Node.js 22 is used in CI. GitHub Actions runs TypeScript checks and the Next.js production build. During initial setup it can install from the pinned direct dependencies when no lockfile exists; commit the generated `package-lock.json` before treating builds as reproducible release builds.
+
+## Not yet implemented
+The authenticated shell is an initial UI foundation. Persisted project CRUD, Manager task decomposition, skill/MCP execution, full RBAC administration, audit viewer APIs, isolated agents/terminal, and production deployment are staged work. Real login needs a configured Supabase project and enabled Auth provider. No production hosting target is configured.

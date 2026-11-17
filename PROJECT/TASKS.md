@@ -1,30 +1,30 @@
 # Execution Backlog
 
-Tasks are intentionally unassigned until a real owner is selected. Status begins as **Backlog**.
+Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Done only when implementation and acceptance evidence are verified.
 
 ## Phase 0 — Repository baseline
-- [ ] T-0001 Confirm application framework, runtime, package manager and directory conventions.
-- [ ] T-0002 Record ADRs for frontend/backend boundaries, execution isolation and tenancy.
+- [ ] T-0001 Record framework/runtime/package manager ADR and repository conventions — **In progress** (Next.js 16, React 19, TypeScript, npm scaffold created).
+- [ ] T-0002 Record architecture decisions for tenancy, worker isolation and data boundaries.
 - [ ] T-0003 Define environments, hosting target, deployment ownership and rollback.
 - [ ] T-0004 Add branch protection and required CI checks after workflow validation.
 
 ## Phase 1 — Data and security
-- [ ] T-0101 Design workspace, membership, project, task, agent-run and artifact schema.
-- [ ] T-0102 Create versioned Supabase migrations and local test configuration.
-- [ ] T-0103 Enable RLS on every exposed table with deny-by-default policies.
-- [ ] T-0104 Implement five-tier role and scoped permission model.
+- [ ] T-0101 Finalize workspace, membership, project, task, agent-run and artifact schema.
+- [ ] T-0102 Create versioned Supabase migrations and test configuration — **In progress** (initial schema draft added; not applied or tested).
+- [ ] T-0103 Enable RLS on every exposed table with deny-by-default policies — **In progress** (policies drafted; integration tests pending).
+- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (schema baseline drafted; server policy enforcement pending).
 - [ ] T-0105 Build RLS and cross-tenant isolation tests for every role/table.
-- [ ] T-0106 Implement append-only audit event schema, writer and retention policy.
+- [ ] T-0106 Implement append-only audit event schema and trigger-based change history — **In progress** (initial draft; immutability tests pending).
 - [ ] T-0107 Test audit immutability, completeness and access logging.
 - [ ] T-0108 Define threat model, secrets handling, rate limits and abuse controls.
 
 ## Phase 2 — Authentication and workspace
-- [ ] T-0201 Implement Supabase Auth and secure session lifecycle.
+- [ ] T-0201 Implement Supabase Auth and secure session lifecycle — **In progress** (magic-link, optional Google OAuth, callback and cookie refresh code added; live provider test pending).
 - [ ] T-0202 Implement workspace onboarding, invitations and membership changes.
-- [ ] T-0203 Implement server-side authorization middleware and Zod contracts.
-- [ ] T-0204 Build responsive workspace shell and role-aware navigation.
+- [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (JWT claim validation and email schema started).
+- [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (initial shell added; role-aware module gating pending).
 - [ ] T-0205 Build project CRUD and authorization tests.
-- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX.
+- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (UI placeholder only; planning service not connected).
 
 ## Phase 3 — Manager orchestration
 - [ ] T-0301 Define initiative, plan-version, milestone, task and dependency contracts.
