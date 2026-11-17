@@ -254,19 +254,42 @@ create policy "agent_runs_insert_operator"
       workspace_id, array['superuser','admin','staff','user']::public.workspace_role[]
     )
   );
-create policy "agent_runs_update_operator"
-  on public.agent_runs for update to authenticated
-  using (public.has_workspace_role(workspace_id, array['superuser','admin','staff']::public.workspace_role[]))
-  with check (public.has_workspace_role(workspace_id, array['superuser','admin','staff']::public.workspace_role[]));
-
 create policy "agent_events_select_member"
   on public.agent_events for select to authenticated
   using (public.is_workspace_member(workspace_id));
-create policy "agent_events_insert_member"
-  on public.agent_events for insert to authenticated
-  with check (public.is_workspace_member(workspace_id));
 
-grant select, insert, update on public.manager_plans to authenticated;
+-- Agent activity is emitted by this trigger, never supplied directly by a browser.
+create or replace function public.write_agent_assignment_event()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  insert into public.agent_events (workspace_id, agent_run_id, event_type, level, message)
+  values (
+    new.workspace_id,
+    new.id,
+    'agent.assigned',
+    'info',
+    new.agent_name || ' received a proposed task. Human approval is required before execution.'
+  );
+  return new;
+end;
+$;
+
+create trigger agent_run_assignment_event
+  after insert on public.agent_runs
+  for each row execute procedure public.write_agent_assignment_event();
+
+grant select, insert on public.manager_plans to authenticated;
+revoke update on public.manager_plans from authenticated;
 grant select, insert, update, delete on public.tasks to authenticated;
-grant select, insert, update on public.agent_runs to authenticated;
-grant select, insert on public.agent_events to authenticated;
+grant select, insert on public.agent_runs to authenticated;
+revoke update on public.agent_runs from authenticated;
+grant insert (
+  workspace_id, project_id, plan_id, task_id, agent_name, agent_role,
+  status, progress, summary, started_by
+) on public.agent_runs to authenticated;
+grant select on public.agent_events to authenticated;
+revoke insert, update, delete on public.agent_events from public, anon, authenticated;
