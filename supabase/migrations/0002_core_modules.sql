@@ -71,6 +71,7 @@ create table public.tasks (
   created_by uuid not null references auth.users(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  unique (id, workspace_id),
   foreign key (project_id, workspace_id)
     references public.projects(id, workspace_id) on delete cascade,
   foreign key (plan_id, workspace_id)
@@ -287,7 +288,9 @@ create trigger agent_run_assignment_event
   after insert on public.agent_runs
   for each row execute procedure public.write_agent_assignment_event();
 
-grant select, insert on public.manager_plans to authenticated;
+grant select on public.manager_plans to authenticated;
+grant insert (workspace_id, project_id, title, source_prompt, description, status, provider, model, created_by)
+  on public.manager_plans to authenticated;
 revoke update on public.manager_plans from authenticated;
 grant select, insert, update, delete on public.tasks to authenticated;
 grant select, insert on public.agent_runs to authenticated;
