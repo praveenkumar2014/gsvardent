@@ -23,6 +23,7 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 - [ ] T-0202 Implement workspace onboarding, invitations and membership changes.
 - [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (verified JWT claims, workspace API access checks and route schemas).
 - [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (core module routes added; workspace selection and complete capability filtering pending).
+- [x] T-0207 Document concrete design tokens from the implemented dark theme in `PROJECT/design/tokens.md` so app UI and prototypes share one design system — light theme baseline remains open.
 - [ ] T-0205 Build project CRUD and authorization tests — **In progress** (project create/read/update; delete and automated authorization tests pending).
 - [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (Manager draft plan and saved history; approval workflow/Execute mode pending).
 

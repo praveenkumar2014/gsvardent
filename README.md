@@ -8,6 +8,7 @@ Verdent is a secure workspace for turning product goals into reviewable plans, c
 - [Progress register](PROJECT/PROGRESS.md)
 - [Execution backlog](PROJECT/TASKS.md)
 - [Architecture and security](PROJECT/architecture/architecture.md)
+- [Design tokens](PROJECT/design/tokens.md)
 
 ## Core application modules in this branch
 - **Projects & tasks:** Supabase-backed project create/read/update, task create/read/status management, tenant-scoped API access.
