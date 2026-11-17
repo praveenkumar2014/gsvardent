@@ -341,12 +341,14 @@ create policy "projects_insert_non_investor"
 create policy "projects_update_staff_admin"
   on public.projects for update to authenticated
   using (
-    public.has_workspace_role(
+    created_by = (select auth.uid())
+    or public.has_workspace_role(
       workspace_id, array['superuser','admin','staff']::public.workspace_role[]
     )
   )
   with check (
-    public.has_workspace_role(
+    created_by = (select auth.uid())
+    or public.has_workspace_role(
       workspace_id, array['superuser','admin','staff']::public.workspace_role[]
     )
   );
