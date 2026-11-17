@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Project = { id: string; name: string };
 type PlanTask = { id: string; title: string; description: string; status: string; priority: string; assigned_agent: string };
@@ -12,6 +12,14 @@ export function ManagerPanel({ workspaceId, projects }: { workspaceId: string; p
   const [tasks, setTasks] = useState<PlanTask[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [history, setHistory] = useState<Array<{ id: string; title: string; provider: string; status: string; created_at: string }>>([]);
+
+  useEffect(() => {
+    fetch(`/api/manager/plans?workspaceId=${workspaceId}`, { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : { plans: [] })
+      .then((payload) => setHistory(payload.plans ?? []))
+      .catch(() => setHistory([]));
+  }, [workspaceId]);
 
   async function decompose(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setPlan(null); setTasks([]); setBusy(true);
@@ -23,6 +31,7 @@ export function ManagerPanel({ workspaceId, projects }: { workspaceId: string; p
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Manager could not create a plan.");
       setPlan(payload.plan); setTasks(payload.tasks);
+      setHistory((current) => [payload.plan, ...current]);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Plan creation failed.");
     } finally { setBusy(false); }
@@ -53,6 +62,10 @@ export function ManagerPanel({ workspaceId, projects }: { workspaceId: string; p
         {error && <div className="module-notice error" role="alert">{error}</div>}
       </section>
 
+      {history.length > 0 && <section className="module-card">
+        <div className="card-heading"><div><span className="card-kicker">SAVED MANAGER PLANS</span><h2>Recent initiatives</h2><p>Draft plans saved in this workspace.</p></div><span className="card-icon">◷</span></div>
+        <div className="manager-history">{history.slice(0, 8).map((item) => <div className="manager-history-row" key={item.id}><strong>{item.title}</strong><span>{item.provider}</span><span>{item.status}</span><small>{new Date(item.created_at).toLocaleString()}</small></div>)}</div>
+      </section>}
       {plan && <section className="module-card plan-result">
         <div className="plan-result-header"><div><span className="card-kicker">DRAFT PLAN · NOT EXECUTING</span><h2>{plan.title}</h2><p>{plan.description}</p></div><span className="provider-chip">{plan.provider === "configured-model" ? "MODEL GENERATED" : "RULES-BASED FALLBACK"}</span></div>
         <div className="plan-stat-row"><span>{tasks.length} tasks created</span><span>Saved to Supabase</span><span>Approval required</span></div>
