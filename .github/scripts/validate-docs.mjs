@@ -34,6 +34,7 @@ const required = [
   "src/app/workspace/hivemind/team-board.tsx",
   "src/app/workspace/admin/page.tsx",
   "src/app/workspace/admin/admin-console.tsx",
+  "src/app/workspace/skills/page.tsx",
   "src/app/api/workspaces/route.ts",
   "src/app/api/projects/route.ts",
   "src/app/api/projects/[projectId]/route.ts",
