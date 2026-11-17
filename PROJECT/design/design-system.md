@@ -3,6 +3,8 @@
 ## Foundations
 Use semantic design tokens for color, typography, spacing, radius, elevation, motion and breakpoints. Support dark and light themes without encoding meaning in color alone.
 
+The concrete token values for the implemented dark theme are documented in [`tokens.md`](tokens.md). UI work must use those values.
+
 ## Components
 Button, icon button, text field, textarea, select, checkbox, tabs, dialog, dropdown, toast, tooltip, badge, avatar, table, data grid, card, navigation rail, breadcrumb, command composer, task status, progress timeline, code diff, terminal panel and audit event row.
 

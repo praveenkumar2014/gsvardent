@@ -7,6 +7,9 @@
 - PR #2 merged the Next.js 16/React 19 app foundation, Supabase SSR login flow, protected workspace shell and initial database migration.
 - The most recent recorded PR #2 GitHub Actions run passed the project validator and TypeScript/production build.
 
+## Design system alignment
+- Extracted the implemented dark-theme values from `src/app/globals.css` into a canonical token reference at `PROJECT/design/tokens.md` (color, typography, radius, elevation, layout, motion, breakpoints, accessibility rules). This is the shared design contract for the Next.js app and any external UI prototypes; the accessible light theme required by the brand guidelines is still an open gap.
+
 ## Implemented on PR #3 feature branch
 - Supabase-backed project list/create/update APIs and UI.
 - Supabase-backed task list/create/status-update APIs and UI.
