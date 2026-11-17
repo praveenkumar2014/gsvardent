@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export const WORKSPACE_ROLES = ["superuser", "admin", "staff", "investor", "user"] as const;
 export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];
@@ -18,6 +19,10 @@ export type WorkspaceRecord = {
 };
 
 export async function getAuthenticatedClient() {
+  if (!isSupabaseConfigured()) {
+    return { ok: false as const, status: 503, message: "Supabase authentication is not configured." };
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
