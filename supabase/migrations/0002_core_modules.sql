@@ -199,6 +199,7 @@ create policy "plans_insert_member"
   on public.manager_plans for insert to authenticated
   with check (
     created_by = (select auth.uid())
+    and status = 'draft'
     and public.has_workspace_role(
       workspace_id, array['superuser','admin','staff','user']::public.workspace_role[]
     )
