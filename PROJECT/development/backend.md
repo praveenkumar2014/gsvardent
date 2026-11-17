@@ -1,0 +1,3 @@
+# Backend Engineering Guide
+
+Authenticate every protected request and authorize every operation on the server. Validate requests and outputs with Zod at trust boundaries. Keep business rules in domain services rather than route handlers or UI. Use explicit transaction boundaries and idempotency for retriable writes. Apply least-privilege credentials and database RLS as defense in depth. Emit append-only audit events for privileged actions. Bound request size, rate, runtime, retries and resource usage. Do not log secrets or raw sensitive payloads. Document operational dependencies, health checks and rollback paths.
