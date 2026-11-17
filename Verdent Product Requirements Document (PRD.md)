@@ -1,0 +1,37 @@
+Product Requirements Document (PRD) — Verdent
+1. Overview & Vision
+Verdent enables teams to go from raw natural language prompts to verified, deployed, and auditable production applications. It bridges the gap between passive AI chat assistants and active developer environments by integrating an autonomous task decomposer ("Manager"), an execution terminal, live browser preview, and a modular skills registry.
+
+2. Target Personas
+The Executive / Founder: Demands fast time-to-market, predictable compute costs, strict security compliance, and complete visibility into project progress.
+The Staff / Lead Engineer: Requires type-safe, inspectable code, granular PR review capabilities, terminal access, and modular architecture without vendor lock-in.
+The Product Manager / Operator: Needs autonomous decomposition of business requirements into trackable milestones and acceptance criteria without writing boilerplate tickets.
+3. Key Functional Modules
+3.1 Authentication & Workspace Onboarding
+Multi-provider auth: Google OAuth, GitHub OAuth, and passwordless magic link email auth via Supabase Auth.
+Mandatory workspace initialization with role assignment.
+3.2 Dual-Mode Interaction Canvas
+Projects View:
+Central prompt composer with model tier selection (Free, Prime).
+Plan mode toggle to preview execution plans before spending credits.
+Quick-start prompt filters (Management, Websites, E-Commerce, Mobile App).
+Managers View:
+High-level initiative planning and autonomous task decomposition.
+Multi-agent collaboration view with state tracking.
+3.3 Three-Pane IDE Workbench
+Left Panel: Navigation (Projects vs Managers, New Task, Skills, Connectors, Website Management, active projects list, profile/settings).
+Center Canvas: Interactive prompt composer, execution progress feeds, diff views.
+Right Panel (Workbench):
+Browser: Sandboxed live web preview of generated applications.
+Files: Hierarchical file tree with syntax-highlighted code editor.
+My App: Realtime health, database inspector, active users, and token/credit consumption.
+Bottom Dock:
+Expandable, multi-tab terminal emulator supporting bash sessions and package execution.
+3.4 Skills & Connectors Registry
+Curated marketplace with search, category filtering, and one-click installation.
+Personal skill authoring engine for custom corporate guidelines and automations.
+Standardized MCP (Model Context Protocol) connector support.
+4. Non-Functional Requirements
+Performance: Initial canvas load under 1.2s; terminal response latency < 50ms; real-time preview updates < 200ms via WebSockets.
+Security: 100% RLS coverage, OWASP Top 10 mitigation, CSRF protection, CSP headers, rate-limiting on edge handlers.
+Reliability: 99.9% uptime SLA, automated WAL archiving, zero-loss transaction boundaries.
