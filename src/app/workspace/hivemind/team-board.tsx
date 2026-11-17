@@ -36,7 +36,11 @@ export function TeamBoard({ workspaceId }: { workspaceId: string }) {
     } finally { setLoading(false); }
   }
 
-  useEffect(() => { void refresh(); }, [workspaceId]);
+  useEffect(() => {
+    void refresh();
+    const interval = window.setInterval(() => { void refresh(); }, 15000);
+    return () => window.clearInterval(interval);
+  }, [workspaceId]);
 
   const active = runs.filter((run) => run.status === "running").length;
   const awaiting = runs.filter((run) => run.status === "waiting_approval").length;
