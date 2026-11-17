@@ -20,7 +20,7 @@
 - GitHub CI validator expanded to verify all core module files.
 
 ## Pending external configuration / verification
-- PR #3 CI is pending final verification.
+- PR #3 GitHub Actions run #44190825551 passed: project/application structure validation, TypeScript check and Next.js production build.
 - Supabase migrations have not been applied to a configured Supabase project; live RLS behavior has not been integration-tested.
 - Supabase URL and publishable key are not configured in a deployment environment.
 - Model API URL/key/model are optional and not configured; until configured, Manager uses rules-based decomposition.
