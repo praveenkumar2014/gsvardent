@@ -15,6 +15,11 @@ export function ManagerPanel({ workspaceId, projects }: { workspaceId: string; p
   const [history, setHistory] = useState<Array<{ id: string; title: string; provider: string; status: string; created_at: string }>>([]);
 
   useEffect(() => {
+    const pendingPrompt = sessionStorage.getItem("verdent.pendingManagerPrompt");
+    if (pendingPrompt) {
+      setPrompt(pendingPrompt);
+      sessionStorage.removeItem("verdent.pendingManagerPrompt");
+    }
     fetch(`/api/manager/plans?workspaceId=${workspaceId}`, { cache: "no-store" })
       .then(async (response) => response.ok ? response.json() : { plans: [] })
       .then((payload) => setHistory(payload.plans ?? []))
