@@ -252,6 +252,7 @@ set search_path = ''
 as $
 begin
   raise exception 'audit_logs is append-only';
+  return null;
 end;
 $;
 
