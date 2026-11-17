@@ -158,21 +158,9 @@ export async function POST(request: NextRequest) {
     summary: "Task assigned in the proposed plan. Execution is paused pending approval and worker configuration.",
     started_by: context.userId
   }));
-  const { data: savedRuns, error: agentError } = await context.supabase
-    .from("agent_runs").insert(agentRows).select("id, agent_name");
-  if (agentError || !savedRuns) {
+  const { error: agentError } = await context.supabase.from("agent_runs").insert(agentRows);
+  if (agentError) {
     return NextResponse.json({ error: "Plan and tasks were saved, but the agent board could not be initialized." }, { status: 400 });
-  }
-
-  const { error: eventError } = await context.supabase.from("agent_events").insert(savedRuns.map((run) => ({
-    workspace_id: parsed.data.workspaceId,
-    agent_run_id: run.id,
-    event_type: "plan.assigned",
-    level: "info",
-    message: `${run.agent_name} is assigned to a proposed task. Human approval is required before execution.`
-  })));
-  if (eventError) {
-    return NextResponse.json({ error: "Plan, tasks and agent assignments were saved, but the event stream could not be initialized." }, { status: 400 });
   }
 
   return NextResponse.json({
