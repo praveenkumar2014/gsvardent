@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const createTaskSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -19,19 +20,42 @@ export async function GET(request: NextRequest) {
     });
   if (!query.success) return NextResponse.json({ error: "Valid workspaceId and projectId are required." }, { status: 400 });
 
-  const context = await getWorkspaceSession(query.data.workspaceId);
+  // Task listing is a workspace-data read; every member role may read (rbac.md
+  // has no tasks.read, so this maps to workspace.read).
+  const context = await getWorkspaceSession(query.data.workspaceId, rolesFor("workspace.read"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase
     .from("tasks")
-    .select("id, title, description, status, priority, assigned_agent, position, created_at")
+    .select("id, plan_id, title, description, status, priority, assigned_agent, position, attempt, last_error, cancelled_at, created_at")
     .eq("workspace_id", query.data.workspaceId)
     .eq("project_id", query.data.projectId)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true });
 
   if (error) return NextResponse.json({ error: "Tasks could not be loaded. Apply migration 0002 first." }, { status: 500 });
-  return NextResponse.json({ tasks: data ?? [] });
+
+  const tasks = data ?? [];
+  const taskIds = tasks.map((task) => task.id);
+  const dependsOn: Record<string, string[]> = {};
+  if (taskIds.length > 0) {
+    // Migration 0004 adds dependencies; a workspace still on 0002/0003 simply
+    // sees no prerequisite information rather than losing its task list.
+    const { data: edges } = await context.supabase
+      .from("task_dependencies")
+      .select("task_id, depends_on_task_id")
+      .eq("workspace_id", query.data.workspaceId)
+      .in("task_id", taskIds);
+    for (const edge of edges ?? []) {
+      const list = dependsOn[edge.task_id] ?? [];
+      list.push(edge.depends_on_task_id);
+      dependsOn[edge.task_id] = list;
+    }
+  }
+
+  return NextResponse.json({
+    tasks: tasks.map((task) => ({ ...task, depends_on: dependsOn[task.id] ?? [] }))
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -39,7 +63,9 @@ export async function POST(request: NextRequest) {
   const parsed = createTaskSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid task details." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
+  // Direct task creation/updates are plan-management actions until the approval
+  // workflow exists (tasks.approve/execute are reserved); same role set as before.
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("tasks.plan"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase

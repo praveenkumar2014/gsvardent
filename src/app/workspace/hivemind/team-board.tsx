@@ -13,7 +13,8 @@ const lanes = [
   { id: "running", label: "Working" },
   { id: "waiting_approval", label: "Awaiting approval" },
   { id: "completed", label: "Completed" },
-  { id: "failed", label: "Needs attention" }
+  { id: "failed", label: "Needs attention" },
+  { id: "cancelled", label: "Cancelled" }
 ];
 
 export function TeamBoard({ workspaceId }: { workspaceId: string }) {

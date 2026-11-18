@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { WORKSPACE_ROLES, type WorkspaceRole } from "@/lib/server/permissions";
 
-export const WORKSPACE_ROLES = ["superuser", "admin", "staff", "investor", "user"] as const;
-export type WorkspaceRole = (typeof WORKSPACE_ROLES)[number];
+export { WORKSPACE_ROLES };
+export type { WorkspaceRole };
 
 export type WorkspaceMembership = {
   id: string;

@@ -12,7 +12,8 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 - [ ] T-0101 Finalize workspace, membership, project, task, agent-run and artifact schema — **In progress** (workspace/project/task/plan/agent run/event tables drafted; artifact schema and full RLS integration tests pending).
 - [ ] T-0102 Create versioned Supabase migrations and test configuration — **In progress** (migrations 0001 and 0002 drafted; not applied/tested in a configured Supabase project).
 - [ ] T-0103 Enable RLS on every exposed table with deny-by-default policies — **In progress** (policies and grants drafted; integration tests pending).
-- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (role-safe Admin/Superuser API and database policies drafted).
+- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (versioned role/permission policy module `src/lib/server/permissions.ts` maps the full rbac.md catalogue with 155 unit tests; RLS policy integration tests pending).
+- [x] T-0109 Add reproducible builds and automated unit tests — `package-lock.json` committed (CI installs via `npm ci`), `vitest` wired as `npm test` in CI, authorization matrix covered by tests.
 - [ ] T-0105 Build RLS and cross-tenant isolation tests for every role/table.
 - [ ] T-0106 Implement append-only audit event schema and trigger-based change history — **In progress** (initial workspace/project/plan/task/run audit triggers; full coverage tests pending).
 - [ ] T-0107 Test audit immutability, completeness and access logging.
@@ -20,18 +21,18 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 
 ## Phase 2 — Authentication and workspace
 - [x] T-0201 Implement Supabase Auth and secure session lifecycle — magic-link, optional Google OAuth, callback and cookie refresh code; live provider test pending.
-- [ ] T-0202 Implement workspace onboarding, invitations and membership changes.
+- [ ] T-0202 Implement workspace onboarding, invitations and membership changes — **In progress** (invitations table + RLS + accept RPC in migration 0003, invite/revoke/accept/remove APIs and Admin console UI; live database tests pending a configured test Supabase).
 - [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (verified JWT claims, workspace API access checks and route schemas).
 - [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (core module routes added; workspace selection and complete capability filtering pending).
 - [ ] T-0205 Build project CRUD and authorization tests — **In progress** (project create/read/update; delete and automated authorization tests pending).
-- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (Manager draft plan and saved history; approval workflow/Execute mode pending).
+- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (Manager draft plans, saved history and explicit approve/reject/cancel/revise controls; live execution remains disabled by design).
 
 ## Phase 3 — Manager orchestration
-- [ ] T-0301 Define initiative, plan-version, milestone, task and dependency contracts — **In progress** (initial plan/task schema and API added; versions/dependencies pending).
+- [ ] T-0301 Define initiative, plan-version, milestone, task and dependency contracts — **In progress** (plan version/supersedes lineage, `task_dependencies` table with cycle guard, Zod contracts; milestones still pending).
 - [ ] T-0302 Implement decomposition service and deterministic persistence — **In progress** (configured model endpoint plus rules-based fallback; model keys not configured).
-- [ ] T-0303 Implement task state machine, cancellation, retries and idempotency — **In progress** (task status transitions; retries/cancel/idempotency pending).
+- [ ] T-0303 Implement task state machine, cancellation, retries and idempotency — **In progress** (pure transition matrix with dependency/retry guards, atomic audited RPCs, idempotency keys; live database verification pending).
 - [ ] T-0304 Add cost, concurrency, timeout and tool-call budgets — **In progress** (model timeout; complete budget accounting pending).
-- [ ] T-0305 Build manager progress and approval interface — **In progress** (plan generation and history; approval actions pending).
+- [ ] T-0305 Build manager progress and approval interface — **In progress** (plan generation, version history, approval/rejection/revision/cancellation and per-task lifecycle controls; isolated worker runtime still not implemented).
 
 ## Phase 4 — Admin and audit
 - [ ] T-0401 Build membership and role administration console — **In progress** (workspace member list and role change UI/API).

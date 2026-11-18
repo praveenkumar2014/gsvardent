@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 export async function GET(request: NextRequest) {
   const query = z.object({
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   });
   if (!query.success) return NextResponse.json({ error: "A valid workspaceId is required." }, { status: 400 });
 
-  const context = await getWorkspaceSession(query.data.workspaceId, ["superuser", "admin"]);
+  const context = await getWorkspaceSession(query.data.workspaceId, rolesFor("audit.read"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   let requestQuery = context.supabase
