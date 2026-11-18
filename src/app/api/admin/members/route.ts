@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession, type WorkspaceRole } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const updateSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   const workspaceId = z.string().uuid().safeParse(request.nextUrl.searchParams.get("workspaceId"));
   if (!workspaceId.success) return NextResponse.json({ error: "A valid workspaceId is required." }, { status: 400 });
 
-  const context = await getWorkspaceSession(workspaceId.data, ["superuser", "admin"]);
+  const context = await getWorkspaceSession(workspaceId.data, rolesFor("members.read"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data: memberships, error } = await context.supabase
@@ -43,7 +44,7 @@ export async function PATCH(request: NextRequest) {
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid membership role update." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin"]);
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("members.update_role"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   if (parsed.data.role === "superuser" && context.membership.role !== "superuser") {
