@@ -27,5 +27,12 @@
 - Isolated agent worker/terminal execution, tool permissions and secure cancellation remain unimplemented.
 - Production hosting, domain, secrets, health checks and rollback target are not configured.
 
+## Authorization matrix batch (this branch)
+- Added `src/lib/server/permissions.ts`: versioned (`POLICY_VERSION = 1`) role/permission policy implementing the full `PROJECT/architecture/rbac.md` catalogue (25 permissions × 5 roles), with `rolesFor(permission)` / `roleHas(role, permission)`.
+- Refactored projects (GET/POST/PATCH), tasks (POST/PATCH), Manager decompose, admin members (GET/PATCH) and admin audit routes to consume the policy module instead of inline role arrays; workspace.ts re-exports the shared role type. Role sets are behavior-preserving (verified against a hand-written expected matrix in tests).
+- Added `tests/permissions.test.ts`: every permission×role mapping tested positive and negative (155 tests), investor never holds write permissions, `platform.manage` is superuser-only.
+- Committed `package-lock.json` (CI now installs via `npm ci`) and wired `npm test` (vitest), which CI already executes when the script exists.
+- Still open: live RLS/migration integration tests (require a configured test Supabase project).
+
 ## Evidence policy
 A UI or source file is not proof of a deployed or fully working feature. Mark integration work complete only after real environment tests, positive/negative authorization tests and passing workflow evidence exist.

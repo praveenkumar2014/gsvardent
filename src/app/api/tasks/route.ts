@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const createTaskSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -19,7 +20,9 @@ export async function GET(request: NextRequest) {
     });
   if (!query.success) return NextResponse.json({ error: "Valid workspaceId and projectId are required." }, { status: 400 });
 
-  const context = await getWorkspaceSession(query.data.workspaceId);
+  // Task listing is a workspace-data read; every member role may read (rbac.md
+  // has no tasks.read, so this maps to workspace.read).
+  const context = await getWorkspaceSession(query.data.workspaceId, rolesFor("workspace.read"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase
@@ -39,7 +42,9 @@ export async function POST(request: NextRequest) {
   const parsed = createTaskSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid task details." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
+  // Direct task creation/updates are plan-management actions until the approval
+  // workflow exists (tasks.approve/execute are reserved); same role set as before.
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("tasks.plan"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase

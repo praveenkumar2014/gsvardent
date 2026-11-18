@@ -12,7 +12,8 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 - [ ] T-0101 Finalize workspace, membership, project, task, agent-run and artifact schema — **In progress** (workspace/project/task/plan/agent run/event tables drafted; artifact schema and full RLS integration tests pending).
 - [ ] T-0102 Create versioned Supabase migrations and test configuration — **In progress** (migrations 0001 and 0002 drafted; not applied/tested in a configured Supabase project).
 - [ ] T-0103 Enable RLS on every exposed table with deny-by-default policies — **In progress** (policies and grants drafted; integration tests pending).
-- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (role-safe Admin/Superuser API and database policies drafted).
+- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (versioned role/permission policy module `src/lib/server/permissions.ts` maps the full rbac.md catalogue with 155 unit tests; RLS policy integration tests pending).
+- [x] T-0109 Add reproducible builds and automated unit tests — `package-lock.json` committed (CI installs via `npm ci`), `vitest` wired as `npm test` in CI, authorization matrix covered by tests.
 - [ ] T-0105 Build RLS and cross-tenant isolation tests for every role/table.
 - [ ] T-0106 Implement append-only audit event schema and trigger-based change history — **In progress** (initial workspace/project/plan/task/run audit triggers; full coverage tests pending).
 - [ ] T-0107 Test audit immutability, completeness and access logging.

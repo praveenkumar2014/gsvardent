@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const updateSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -17,7 +18,9 @@ export async function PATCH(request: NextRequest, route: { params: Promise<{ tas
   const parsed = updateSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid task update." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
+  // Status/priority/assignment updates are plan-management actions until the
+  // approval workflow exists (tasks.approve/execute are reserved); same roles as before.
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("tasks.plan"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const updates = {
