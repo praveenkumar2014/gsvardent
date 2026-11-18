@@ -27,5 +27,19 @@
 - Isolated agent worker/terminal execution, tool permissions and secure cancellation remain unimplemented.
 - Production hosting, domain, secrets, health checks and rollback target are not configured.
 
+## Authorization matrix batch (this branch)
+- Added `src/lib/server/permissions.ts`: versioned (`POLICY_VERSION = 1`) role/permission policy implementing the full `PROJECT/architecture/rbac.md` catalogue (25 permissions × 5 roles), with `rolesFor(permission)` / `roleHas(role, permission)`.
+- Refactored projects (GET/POST/PATCH), tasks (POST/PATCH), Manager decompose, admin members (GET/PATCH) and admin audit routes to consume the policy module instead of inline role arrays; workspace.ts re-exports the shared role type. Role sets are behavior-preserving (verified against a hand-written expected matrix in tests).
+- Added `tests/permissions.test.ts`: every permission×role mapping tested positive and negative (155 tests), investor never holds write permissions, `platform.manage` is superuser-only.
+- Committed `package-lock.json` (CI now installs via `npm ci`) and wired `npm test` (vitest), which CI already executes when the script exists.
+- Still open: live RLS/migration integration tests (require a configured test Supabase project).
+
+## Invitations & membership lifecycle batch (this branch)
+- Migration `0003_workspace_invitations.sql`: `workspace_invitations` table (single pending invite per workspace+email, 64-hex token, 7-day expiry, role constrained to admin/staff/investor/user — superuser is not grantable by invitation), RLS policies (select for admins or the addressed account, insert/update admin-only, no client delete), append-only audit trigger, and the `accept_workspace_invitation` security-definer RPC that validates pending/unexpired/addressed-to-caller server-side before inserting the membership. Also adds the `guard_last_privileged_member` trigger so a workspace can never lose its final admin/superuser.
+- New APIs: `GET/POST /api/admin/invitations` (list/create, policy-gated `members.read`/`members.invite`), `PATCH /api/admin/invitations/[invitationId]` (revoke pending only, `members.revoke`), `POST /api/invitations/accept` (token RPC call, authentication required), `DELETE /api/admin/members` (remove member, `members.revoke`, DB enforces no self-removal and last-admin guard).
+- Admin console: invite form (email + role), pending invitations table with status chips and revoke action, member remove action with confirmation.
+- Tests: `tests/invitations.test.ts` (11 tests) covering email/role/token/action schema validation and the invite/revoke permission mapping. Total suite: 166 passing.
+- Not verified: migration 0003 has not been applied to a live Supabase project (same blocked configuration as migrations 0001/0002).
+
 ## Evidence policy
 A UI or source file is not proof of a deployed or fully working feature. Mark integration work complete only after real environment tests, positive/negative authorization tests and passing workflow evidence exist.

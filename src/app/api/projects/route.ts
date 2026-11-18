@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const workspaceQuery = z.string().uuid();
 const createProjectSchema = z.object({
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   const parsed = workspaceQuery.safeParse(request.nextUrl.searchParams.get("workspaceId"));
   if (!parsed.success) return NextResponse.json({ error: "A valid workspaceId is required." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data);
+  const context = await getWorkspaceSession(parsed.data, rolesFor("projects.read"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Check the project name, description and workspace." }, { status: 400 });
   }
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("projects.create"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { data, error } = await context.supabase

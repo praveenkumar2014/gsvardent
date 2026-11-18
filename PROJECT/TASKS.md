@@ -12,7 +12,8 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 - [ ] T-0101 Finalize workspace, membership, project, task, agent-run and artifact schema — **In progress** (workspace/project/task/plan/agent run/event tables drafted; artifact schema and full RLS integration tests pending).
 - [ ] T-0102 Create versioned Supabase migrations and test configuration — **In progress** (migrations 0001 and 0002 drafted; not applied/tested in a configured Supabase project).
 - [ ] T-0103 Enable RLS on every exposed table with deny-by-default policies — **In progress** (policies and grants drafted; integration tests pending).
-- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (role-safe Admin/Superuser API and database policies drafted).
+- [ ] T-0104 Implement five-tier role and scoped permission model — **In progress** (versioned role/permission policy module `src/lib/server/permissions.ts` maps the full rbac.md catalogue with 155 unit tests; RLS policy integration tests pending).
+- [x] T-0109 Add reproducible builds and automated unit tests — `package-lock.json` committed (CI installs via `npm ci`), `vitest` wired as `npm test` in CI, authorization matrix covered by tests.
 - [ ] T-0105 Build RLS and cross-tenant isolation tests for every role/table.
 - [ ] T-0106 Implement append-only audit event schema and trigger-based change history — **In progress** (initial workspace/project/plan/task/run audit triggers; full coverage tests pending).
 - [ ] T-0107 Test audit immutability, completeness and access logging.
@@ -20,7 +21,7 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 
 ## Phase 2 — Authentication and workspace
 - [x] T-0201 Implement Supabase Auth and secure session lifecycle — magic-link, optional Google OAuth, callback and cookie refresh code; live provider test pending.
-- [ ] T-0202 Implement workspace onboarding, invitations and membership changes.
+- [ ] T-0202 Implement workspace onboarding, invitations and membership changes — **In progress** (invitations table + RLS + accept RPC in migration 0003, invite/revoke/accept/remove APIs and Admin console UI; live database tests pending a configured test Supabase).
 - [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (verified JWT claims, workspace API access checks and route schemas).
 - [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (core module routes added; workspace selection and complete capability filtering pending).
 - [ ] T-0205 Build project CRUD and authorization tests — **In progress** (project create/read/update; delete and automated authorization tests pending).

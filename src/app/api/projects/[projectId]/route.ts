@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession } from "@/lib/server/workspace";
+import { rolesFor } from "@/lib/server/permissions";
 
 const updateProjectSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -21,7 +22,7 @@ export async function PATCH(request: NextRequest, route: RouteContext) {
   const parsed = updateProjectSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid project update." }, { status: 400 });
 
-  const context = await getWorkspaceSession(parsed.data.workspaceId, ["superuser", "admin", "staff", "user"]);
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("projects.update"));
   if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
 
   const { workspaceId, ...updates } = parsed.data;
