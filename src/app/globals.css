@@ -309,3 +309,6 @@ a{color:inherit;text-decoration:none}
 .skills-checks span{border:1px solid var(--line);border-radius:7px;padding:11px;background:rgba(255,255,255,.015)}
 .module-hint{padding-top:14px;border-top:1px solid var(--line);font-size:9px!important;color:#66766b!important}
 @media(max-width:700px){.project-edit-form{grid-template-columns:1fr}.manager-history-row{grid-template-columns:1fr 1fr}.manager-history-row strong{grid-column:1/-1}.skills-checks{grid-template-columns:1fr}}
+
+.invitation-status-pending{color:#edcf9a;background:rgba(176,134,67,.1)}
+.invitation-status-final{color:#a8b5ac;background:rgba(160,173,164,.06)}

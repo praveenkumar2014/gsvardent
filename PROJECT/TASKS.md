@@ -21,7 +21,7 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 
 ## Phase 2 — Authentication and workspace
 - [x] T-0201 Implement Supabase Auth and secure session lifecycle — magic-link, optional Google OAuth, callback and cookie refresh code; live provider test pending.
-- [ ] T-0202 Implement workspace onboarding, invitations and membership changes.
+- [ ] T-0202 Implement workspace onboarding, invitations and membership changes — **In progress** (invitations table + RLS + accept RPC in migration 0003, invite/revoke/accept/remove APIs and Admin console UI; live database tests pending a configured test Supabase).
 - [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (verified JWT claims, workspace API access checks and route schemas).
 - [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (core module routes added; workspace selection and complete capability filtering pending).
 - [ ] T-0205 Build project CRUD and authorization tests — **In progress** (project create/read/update; delete and automated authorization tests pending).

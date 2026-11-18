@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getWorkspaceSession, type WorkspaceRole } from "@/lib/server/workspace";
 import { rolesFor } from "@/lib/server/permissions";
+import { removeMembershipSchema } from "@/lib/server/invitations";
 
 const updateSchema = z.object({
   workspaceId: z.string().uuid(),
@@ -76,4 +77,27 @@ export async function PATCH(request: NextRequest) {
 
   if (error || !data) return NextResponse.json({ error: "Role change was rejected by the database policy." }, { status: 403 });
   return NextResponse.json({ membership: data });
+}
+
+export async function DELETE(request: NextRequest) {
+  const body = await request.json().catch(() => null);
+  const parsed = removeMembershipSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: "Invalid membership removal request." }, { status: 400 });
+
+  const context = await getWorkspaceSession(parsed.data.workspaceId, rolesFor("members.revoke"));
+  if (!context.ok) return NextResponse.json({ error: context.message }, { status: context.status });
+
+  // The database additionally blocks self-removal (memberships_delete_admin)
+  // and removing the final admin/superuser (guard_last_privileged_member,
+  // migration 0003); surface those rejections as authorization failures.
+  const { data, error } = await context.supabase
+    .from("workspace_memberships")
+    .delete()
+    .eq("id", parsed.data.membershipId)
+    .eq("workspace_id", parsed.data.workspaceId)
+    .select("id, user_id, role")
+    .single();
+
+  if (error || !data) return NextResponse.json({ error: "Membership could not be removed. It may be your own membership, the last privileged membership, or restricted by policy." }, { status: 403 });
+  return NextResponse.json({ removed: true });
 }
