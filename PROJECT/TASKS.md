@@ -25,14 +25,14 @@ Task statuses: **Backlog**, **In progress**, **Blocked**, **Done**. A task is Do
 - [ ] T-0203 Implement server-side authorization middleware and Zod contracts — **In progress** (verified JWT claims, workspace API access checks and route schemas).
 - [ ] T-0204 Build responsive workspace shell and role-aware navigation — **In progress** (core module routes added; workspace selection and complete capability filtering pending).
 - [ ] T-0205 Build project CRUD and authorization tests — **In progress** (project create/read/update; delete and automated authorization tests pending).
-- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (Manager draft plan and saved history; approval workflow/Execute mode pending).
+- [ ] T-0206 Build Plan/Execute prompt canvas and approval UX — **In progress** (Manager draft plans, saved history and explicit approve/reject/cancel/revise controls; live execution remains disabled by design).
 
 ## Phase 3 — Manager orchestration
-- [ ] T-0301 Define initiative, plan-version, milestone, task and dependency contracts — **In progress** (initial plan/task schema and API added; versions/dependencies pending).
+- [ ] T-0301 Define initiative, plan-version, milestone, task and dependency contracts — **In progress** (plan version/supersedes lineage, `task_dependencies` table with cycle guard, Zod contracts; milestones still pending).
 - [ ] T-0302 Implement decomposition service and deterministic persistence — **In progress** (configured model endpoint plus rules-based fallback; model keys not configured).
-- [ ] T-0303 Implement task state machine, cancellation, retries and idempotency — **In progress** (task status transitions; retries/cancel/idempotency pending).
+- [ ] T-0303 Implement task state machine, cancellation, retries and idempotency — **In progress** (pure transition matrix with dependency/retry guards, atomic audited RPCs, idempotency keys; live database verification pending).
 - [ ] T-0304 Add cost, concurrency, timeout and tool-call budgets — **In progress** (model timeout; complete budget accounting pending).
-- [ ] T-0305 Build manager progress and approval interface — **In progress** (plan generation and history; approval actions pending).
+- [ ] T-0305 Build manager progress and approval interface — **In progress** (plan generation, version history, approval/rejection/revision/cancellation and per-task lifecycle controls; isolated worker runtime still not implemented).
 
 ## Phase 4 — Admin and audit
 - [ ] T-0401 Build membership and role administration console — **In progress** (workspace member list and role change UI/API).

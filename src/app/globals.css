@@ -312,3 +312,20 @@ a{color:inherit;text-decoration:none}
 
 .invitation-status-pending{color:#edcf9a;background:rgba(176,134,67,.1)}
 .invitation-status-final{color:#a8b5ac;background:rgba(160,173,164,.06)}
+
+/* Manager workflow batch: version, decision and lifecycle controls.
+   Colours reuse the canonical dark-theme status palette above. */
+.status-approved{color:#9fe3bd;background:rgba(69,157,107,.12)}
+.status-draft{color:#a8b5ac;background:rgba(160,173,164,.06)}
+.status-rejected,.status-cancelled,.status-superseded{color:#f0aaaa;background:rgba(184,73,73,.1)}
+.plan-version{font:9px var(--font-mono);color:#9fe3bd;border:1px solid rgba(154,207,177,.2);border-radius:5px;padding:4px 6px;background:rgba(96,161,121,.08)}
+.plan-hint{margin:10px 0 0;color:#819087;font-size:10px;line-height:1.6}
+.plan-action-bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.plan-action-bar button,.task-action-bar button{font-size:10px;padding:8px 11px}
+.task-action-bar{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.plan-task-copy{display:grid;gap:5px;min-width:0;flex:1}
+.task-error{color:#f0aaaa}
+.revision-form{display:grid;gap:9px;margin:14px 0;padding:15px;border:1px solid rgba(142,217,174,.18);border-radius:10px;background:rgba(96,161,121,.04)}
+.revision-form label{font:9px var(--font-mono);color:#819087;text-transform:uppercase;letter-spacing:.08em}
+.revision-form textarea,.revision-form input{width:100%;border:1px solid var(--line);border-radius:7px;background:rgba(255,255,255,.025);color:#dbe7df;padding:10px;font:11px var(--font-mono);resize:vertical}
+.revision-actions{display:flex;gap:8px;flex-wrap:wrap}
